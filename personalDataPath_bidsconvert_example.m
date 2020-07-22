@@ -37,6 +37,7 @@ if ~isempty(varargin{1})
             cfg(2).proj_dirinput = '/folder/to/BIDS-files/PRIOS_study/';
             cfg(1).proj_diroutput = '/folder/to/BIDS-files/PRIOS_study/';
             
+            
         end
         pat = [input('What is the PAT-folder in micromed database? [PAT_XXX] ','s'),'/'];
         cfg(1).pathname = fullfile(cfg(1).proj_dirinput,pat);        

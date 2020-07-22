@@ -4,11 +4,12 @@
 
 % Dorien van Blooijs, Willemiek Zweiphenning 2019
 
+clear all
 
 %% patient characteristics
 
 clear cfg
-cfg.sub_labels = {['sub-' input('Patient number (RESPXXXX)/(REC2StimXX)/(PRIOSXX): ','s')]};
+cfg.sub_labels = {['sub-' input('Patient number (RESPXXXX)/(PRIOSXX): ','s')]};
 cfg.mode = 'bidsconversion';
 
 % set paths
