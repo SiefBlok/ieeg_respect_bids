@@ -36,9 +36,9 @@ try
     C=strsplit(str2parse,';');
     D = strsplit(C{2},'y');
     if str2double(D{2}) <10
-        metadata.run_name=['0' deblank(D{2})];
+        metadata.run_name=['0' strtrim(D{2})];
     else
-        metadata.run_name=deblank(D{2});
+        metadata.run_name=strtrim(D{2});
     end
     
     %% ---------- TASK ----------
@@ -49,7 +49,7 @@ try
     end
     str2parse=annots{task_idx,2};
     C=strsplit(str2parse,';');
-    metadata.task_name=deblank(C{2});
+    metadata.task_name=strtrim(C{2});
       
     if contains(metadata.task_name,'SPES')
         % Stimcurr unknown (in SPES)
@@ -68,8 +68,7 @@ try
     %% ---------- FORMAT ----------
     format_idx=cellfun(@(x) contains(x,{'Format'}),annots(:,2));
     if(sum(format_idx)<1)
-%         file = dir(fullfile(cfg(2).proj_dirinput,patName,['ses-',metadata.ses_name],'ieeg','*_ieeg.json'));
-         file = dir(fullfile(cfg(2).proj_dirinput,patName,'ses-1','ieeg','*_ieeg.json'));
+         file = dir(fullfile(cfg(2).proj_dirinput,patName,['ses-',metadata.ses_name],'ieeg','*_ieeg.json'));
 
         if ~isempty(file)
             ieeg_json = jsondecode(fileread([file(1).folder '/' file(1).name]) );
@@ -121,8 +120,29 @@ try
      %% ---------- GENDER ----------
     gender_idx=cellfun(@(x) contains(x,{'Gender'}),annots(:,2));
     if(sum(gender_idx)~=1)
-        warning('Gender is missing')
-        metadata.gender = 'unknown';
+        % if "Gender" is not annotated in this file, check if it was previously annotated and is present in participants.tsv
+        files_DBlevel = dir(cfg(1).proj_diroutput); % look for files present in database folder 
+        if contains([files_DBlevel(:).name],'participants') 
+            filename = fullfile(cfg(1).proj_diroutput,'participants.tsv');
+            % read existing participants_tsv-file
+            participants_tsv = read_tsv(filename);
+            % look whether the name is already in the participants-table
+            if any(contains(participants_tsv.name,deblank(header.name))) 
+                % check if actual gender annotation is in there, and gender is not empty or 'unknown
+                if and(~isempty(participants_tsv.sex(find(contains(participants_tsv.name,deblank(header.name))))),~contains(participants_tsv.sex(find(contains(participants_tsv.name,deblank(header.name)))),{'unknown'})) 
+                metadata.gender=char(participants_tsv.sex(find(contains(participants_tsv.name,deblank(header.name))))); % copy gender 
+                else
+                warning('Gender is missing')
+                metadata.gender = 'unknown';
+                end
+            else % patient is not present in participants.tsv
+                warning('Gender is missing')
+                metadata.gender = 'unknown';
+            end
+        else % there is no participants.tsv
+            warning('Gender is missing')
+            metadata.gender = 'unknown';
+        end
     else
         str2parse=annots{gender_idx,2};
         C=strsplit(str2parse,';');
@@ -138,7 +158,9 @@ try
     if(sum(badhf_idx))
         metadata.ch2use_badhf=single_annotation(annots,'Bad_HF',ch);
         if any(contains(annots(:,2),'NB BadHF annotated in avg'))
-            metadata.ch2use_badhf.note = 'NB BadHF annotated in avg';
+            metadata.ch2use_badhf_note = 'NB BadHF annotated in avg';
+        else
+             metadata.ch2use_badhf_note = '';
         end
     end
     
@@ -257,6 +279,10 @@ try
     %% Look for artefacts cECoG
     metadata.artefacts=look_for_annotation_start_stop(annots,'Art_on','Art_off',ch,header);
     
+    if any(contains(annots(:,2),'NB artefacts annotated in avg'))
+        metadata.artefacts_note = 'NB artefacts annotated in avg';
+    end
+    
     %% Look for sleep data
     metadata.sleep=look_for_annotation_start_stop(annots,'Sl_on','Sl_off',ch,header);
     
@@ -334,6 +360,6 @@ try
     %
 catch ME
     status = 1;
-    msg = sprintf('%s err:%s --func:%s',deblank(patName'),ME.message,ME.stack(1).name);
+    msg = sprintf('%s err:%s --func:%s',strtrim(patName'),ME.message,ME.stack(1).name);
     
 end

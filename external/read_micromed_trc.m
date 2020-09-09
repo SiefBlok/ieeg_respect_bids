@@ -14,7 +14,7 @@ end
 
 %------------------reading patient & recording info----------
 fseek(fid,64,-1);
-header.surname=char(fread(fid,11,'char'))';     % 11 was 22
+header.surname=char(fread(fid,22,'char'))';     
 header.name=char(fread(fid,20,'char'))';
 fseek(fid,106,-1);
 header.birthmonth = fread(fid,1,'uchar');

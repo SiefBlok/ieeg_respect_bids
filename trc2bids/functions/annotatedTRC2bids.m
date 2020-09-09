@@ -58,9 +58,13 @@ try
         error('TRC reading failed')  ;
     end
     
+
     ch_label = deblank({header.elec.Name}');
     sub_label = strcat('sub-',strtrim(header.name));
-%    sub_label = header.surname;
+
+    ch_label = strtrim({header.elec.Name}');
+    sub_label = strcat('sub-',strtrim(header.name));
+
     
     [status,msg,metadata] = extract_metadata_from_annotations(header,annots,ch_label,trigger,sub_label,cfg);
     

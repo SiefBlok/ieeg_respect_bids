@@ -18,7 +18,7 @@ cfg = setLocalDataPath(cfg);
 
 %% run all patients in database
 pats = dir(cfg(1).proj_dirinput);
-
+runpat = struct;
 for pat = 1:size(pats,1)
     
     if contains(pats(pat).name,'PAT')
@@ -29,8 +29,6 @@ for pat = 1:size(pats,1)
         if size(files,1)<1
             error('Pathname is wrong, no files found')
         end
-        
-        runpat = struct;
         
         % run all files within your input directory
         for i=1:size(files,1)
@@ -46,6 +44,7 @@ for pat = 1:size(pats,1)
                 
                 fprintf('Running %s, writing EEG: %s to BIDS \n', patient,file)
                 [runpat(pat).runall(i).status,runpat(pat).runall(i).msg,runpat(pat).runall(i).metadata,runpat(pat).runall(i).annots] = annotatedTRC2bids(cfg);
+            
             end
         end
         
@@ -69,6 +68,9 @@ for i=1:size(runpat,2)
         if any(vertcat(runpat(i).runall(:).status) == 1)
             
             runpat(i).status = 1;
+            
+        else
+            runpat(i).status = 0;
             
             
         end
