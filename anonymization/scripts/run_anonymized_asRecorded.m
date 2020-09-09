@@ -31,7 +31,7 @@ for i=1:size(files,1)
         
         fileName = [pathname, filename];
         % anonymize the TRC file
-        [status,msg] = anonymized_asRecorded(fileName,cfg.respName)
+        [status,msg] = anonymized_asRecorded(fileName,respName);
         
     end
 end

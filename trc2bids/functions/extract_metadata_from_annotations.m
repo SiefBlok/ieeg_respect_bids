@@ -68,7 +68,9 @@ try
     %% ---------- FORMAT ----------
     format_idx=cellfun(@(x) contains(x,{'Format'}),annots(:,2));
     if(sum(format_idx)<1)
-        file = dir(fullfile(cfg(2).proj_dirinput,patName,['ses-',metadata.ses_name],'ieeg','*ieeg.json'));
+%         file = dir(fullfile(cfg(2).proj_dirinput,patName,['ses-',metadata.ses_name],'ieeg','*_ieeg.json'));
+         file = dir(fullfile(cfg(2).proj_dirinput,patName,'ses-1','ieeg','*_ieeg.json'));
+
         if ~isempty(file)
             ieeg_json = jsondecode(fileread([file(1).folder '/' file(1).name]) );
             metadata.format_info = ieeg_json.iEEGElectrodeGroups;

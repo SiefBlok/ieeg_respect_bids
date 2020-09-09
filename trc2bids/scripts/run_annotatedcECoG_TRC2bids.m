@@ -6,6 +6,7 @@
 
 clear all
 
+
 %% patient characteristics
 
 clear cfg
